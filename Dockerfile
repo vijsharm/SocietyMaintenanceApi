@@ -1,13 +1,29 @@
-FROM eclipse-temurin:17-jre-alpine
+# ---------- STAGE 1 : BUILD ----------
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
-# Create working directory
 WORKDIR /app
 
-# Copy pre-built jar from target folder
-COPY target/*.jar app.jar
+# Copy only pom first (for better layer caching)
+COPY pom.xml .
 
-# Expose Spring Boot default port
+# Download dependencies
+RUN mvn dependency:go-offline
+
+# Copy source code
+COPY src ./src
+
+# Build jar
+RUN mvn clean package -DskipTests
+
+
+# ---------- STAGE 2 : RUNTIME ----------
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+# Copy jar from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Run application
 ENTRYPOINT ["java","-XX:+UseContainerSupport","-jar","app.jar"]
