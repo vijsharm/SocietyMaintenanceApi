@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,34 +26,32 @@ public class StatisticsService {
     public List<PendingDuesResponse> getPendingDuesForAllMembers() {
 
         List<Member> members = memberRepository.findAll();
-        LocalDate now = LocalDate.now();
+        YearMonth currentMonth = YearMonth.now();
 
         return members.stream()
-                .map(member -> calculatePendingForMember(member, now))
+                .map(member -> calculatePendingForMember(member, currentMonth))
                 .toList();
     }
 
     private PendingDuesResponse calculatePendingForMember(
             Member member,
-            LocalDate now
+            YearMonth currentMonth
     ) {
-
+        YearMonth start = YearMonth.from(member.getActiveSince());
+        List<PendingMonthDTO> pendingMonths = new ArrayList<>();
+        double totalMaintenancePending = 0.0;
         List<Payment> payments =
                 paymentRepository.findByMemberId(member.getId());
 
-        LocalDate start = member.getActiveSince().withDayOfMonth(1);
-        LocalDate currentMonth = now.withDayOfMonth(1);
-
-        List<PendingMonthDTO> pendingMonths = new ArrayList<>();
         double monthlyAmount = member.getMonthlyAmount();
-        double totalMaintenancePending = 0.0;
+
 
         while (!start.isAfter(currentMonth)) {
 
-            String monthStr = start.toString().substring(0, 7);
+            String monthStr = start.toString();
 
             boolean paid = payments.stream()
-                    .anyMatch(p -> monthStr.equals(p.getMonth()));
+                    .anyMatch(p -> monthStr.equals(p.getMonth().toString().trim()));
 
             if (!paid) {
                 pendingMonths.add(
