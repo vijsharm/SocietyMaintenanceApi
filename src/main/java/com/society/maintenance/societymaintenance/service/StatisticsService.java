@@ -86,7 +86,7 @@ public class StatisticsService {
 
         YearMonth start = startMonth != null
                 ? YearMonth.parse(startMonth)
-                : YearMonth.now().minusMonths(5);
+                : YearMonth.of(2026, 3);
 
         YearMonth end = endMonth != null
                 ? YearMonth.parse(endMonth)
