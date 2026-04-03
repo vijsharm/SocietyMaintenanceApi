@@ -17,5 +17,19 @@ public class PaymentRequest {
     public LocalDate paymentDate;    // "YYYY-MM-DD"
     public String paymentMode;
     public String transactionId;
+
+    public PaymentRequest(Long id, Long memberId, Double amount, YearMonth month,
+                          LocalDate paymentDate, String paymentMode, String transactionId) {
+        this.id = id;
+        this.memberId = memberId;
+        this.amount = amount;
+        this.month = month;
+        this.paymentDate = paymentDate;
+        this.paymentMode = paymentMode;
+        this.transactionId = transactionId;
+        this.paymentType = "maintenance";
+    }
+
+    public String paymentType = "maintenance";
 }
 
