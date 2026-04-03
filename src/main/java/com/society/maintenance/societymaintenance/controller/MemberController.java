@@ -49,5 +49,14 @@ public class MemberController {
     public List<MemberDto> getAllMembers() {
         return service.getAllMembers();
     }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','VIEWER')")
+    public MemberDto getMember( @PathVariable Long id) {
+        return service.getMember(id)
+                .map(m -> new MemberDto(m.getId(), m.getName(), m.getFlatNumber(),
+                        m.getEmail(), m.getPhone(), m.getMonthlyAmount(), null, m.getActiveSince()))
+                .orElse(null);
+    }
 }
 

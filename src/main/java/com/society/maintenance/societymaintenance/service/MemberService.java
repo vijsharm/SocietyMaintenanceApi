@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -80,5 +81,12 @@ public class MemberService {
     public List<MemberDto> getAllMembers() {
         return memberRepository.findAllWithElectricityDues();
     }
+
+    public Optional<Member> getMember(Long id) {
+        return memberRepository.findById(id);
+    }
+
+
+
 }
 
