@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +32,8 @@ public class StatementService {
                 paymentRepository.findByMemberIdOrderByPaymentDateDesc(memberId);
 
         // ---- Calculate Maintenance Pending ----
-        LocalDate now = LocalDate.now();
-        LocalDate start = member.getActiveSince().withDayOfMonth(1);
-        LocalDate currentMonth = now.withDayOfMonth(1);
+        YearMonth start = YearMonth.from(member.getActiveSince());
+        YearMonth currentMonth = YearMonth.now();
 
         List<MaintenanceDue> maintenanceDues = new ArrayList<>();
 
@@ -45,10 +44,10 @@ public class StatementService {
 
         while (!start.isAfter(currentMonth)) {
 
-            String monthStr = start.toString().substring(0, 7);
+            String monthStr = start.toString();
 
             boolean paid = payments.stream()
-                    .anyMatch(p -> monthStr.equals(p.getMonth()));
+                    .anyMatch(p -> monthStr.equals(p.getMonth().toString().trim()));
 
             if (!paid) {
                 maintenanceDues.add(
