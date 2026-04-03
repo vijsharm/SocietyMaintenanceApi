@@ -1,5 +1,6 @@
 package com.society.maintenance.societymaintenance.service;
 
+import com.society.maintenance.societymaintenance.dto.BulkPaymentRequest;
 import com.society.maintenance.societymaintenance.dto.PaymentRequest;
 import com.society.maintenance.societymaintenance.entity.Member;
 import com.society.maintenance.societymaintenance.entity.Payment;
@@ -14,6 +15,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -67,5 +70,36 @@ public class PaymentService {
 
         return paymentRepository.findAll(spec, pageable);
     }
+
+    public List<Payment> createBulkPayments(BulkPaymentRequest request) {
+
+        List<Payment> paymentsToSave = new ArrayList<>();
+
+        for (PaymentRequest dto : request.getPayments()) {
+
+            Member member = memberRepository.findById(dto.memberId)
+                    .orElseThrow(() -> new RuntimeException("Member not found: " + dto.memberId));
+
+            Payment payment = new Payment();
+
+            payment.setMember(member);
+            payment.setAmount(dto.amount);
+
+            if (dto.month != null) {
+                payment.setMonth(dto.month);
+            }
+
+            payment.setPaymentDate(
+                    dto.paymentDate != null ? dto.paymentDate : LocalDate.now()
+            );
+            payment.setPaymentMode(dto.paymentMode);
+            payment.setTransactionId(dto.transactionId);
+            paymentsToSave.add(payment);
+        }
+
+        List<Payment> savedPayments = paymentRepository.saveAll(paymentsToSave);
+        return  savedPayments;
+    }
+
 }
 

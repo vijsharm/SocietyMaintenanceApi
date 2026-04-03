@@ -1,6 +1,8 @@
 package com.society.maintenance.societymaintenance.controller;
 
 import com.society.maintenance.societymaintenance.dto.ApiResponse;
+import com.society.maintenance.societymaintenance.dto.BulkPaymentRequest;
+import com.society.maintenance.societymaintenance.dto.BulkPaymentResponseDTO;
 import com.society.maintenance.societymaintenance.dto.PaymentRequest;
 import com.society.maintenance.societymaintenance.entity.Payment;
 import com.society.maintenance.societymaintenance.service.PaymentService;
@@ -45,5 +47,19 @@ public class PaymentController {
                 payment.getPaymentMode(),
                 payment.getTransactionId()
         );
+    }
+
+    @PostMapping("/bulk")
+    public BulkPaymentResponseDTO createBulkPayments(
+            @RequestBody BulkPaymentRequest request
+    ) {
+        var payments =  service.createBulkPayments(request);
+        var responseList = payments.stream()
+                .map(this::mapToResponse).toList();
+        BulkPaymentResponseDTO response = new BulkPaymentResponseDTO();
+        response.setSuccess(true);
+        response.setCount(responseList.size());
+        response.setPayments(responseList);
+        return response;
     }
 }

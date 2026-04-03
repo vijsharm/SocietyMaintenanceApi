@@ -1,11 +1,13 @@
 package com.society.maintenance.societymaintenance.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 
 @AllArgsConstructor
+@NoArgsConstructor
 public class PaymentRequest {
 
     public Long id;
